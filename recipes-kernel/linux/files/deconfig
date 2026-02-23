@@ -1,0 +1,16 @@
+inherit kernel
+require recipes-kernel/linux/linux-yocto.inc
+
+SRC_URI = "git://git.yoctoproject.org/linux-yocto.git;protocol=https;osync=1;branch=v6.2/standard/base"
+SRCREV = "${AUTOREV}"
+
+LINUX_VERSION = "6.2"
+LINUX_VERSION_EXTENSION = "-custom"
+
+COMPATIBLE_MACHINE = "qemux86-64"
+
+KCONF_Selection = "n" 
+
+KCONFIG_MODE = "--alldefconfig"
+
+do_kernel_metadata[noexec] = "1"
