@@ -1,0 +1,9 @@
+LCONF_VERSION = "7"
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+BBLAYERS ?= " \
+  /home/builduser/yocto/poky/meta \
+  /home/builduser/yocto/poky/meta-poky \
+  /home/builduser/yocto/poky/meta-yocto-bsp \
+  /home/builduser/yocto/poky/meta-custom-layer \
+  "
