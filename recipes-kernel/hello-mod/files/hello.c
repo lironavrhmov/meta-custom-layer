@@ -2,7 +2,7 @@
 #include <linux/kernel.h>
 
 static int __init hello_init(void) {
-    pr_info("Hello World: Driver loaded successfully!\n");
+    pr_info("Hello World Liron: Driver loaded successfully!\n");
     return 0;
 }
 
