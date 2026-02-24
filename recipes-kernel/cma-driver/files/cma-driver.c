@@ -6,6 +6,7 @@
 #include <linux/fs.h>
 #include <linux/uaccess.h>
 #include <linux/miscdevice.h>
+#include <linux/ktime.h>
 
 static struct device cma_dev;
 static dma_addr_t dma_handle;
@@ -27,7 +28,7 @@ static ssize_t cma_write(struct file *file, const char __user *buf, size_t count
     size_t len = min(count, cma_size - 1);
     memset(vaddr, 0, cma_size);
     if (copy_from_user(vaddr, buf, len)) return -EFAULT;
-    pr_info("CMA: Data written to memory: %s\n", (char *)vaddr);
+    pr_info("CMA: Data written: %s\n", (char *)vaddr);
     return len;
 }
 
@@ -44,6 +45,8 @@ static struct miscdevice cma_misc = {
 };
 
 static int __init cma_driver_init(void) {
+    ktime_t start, end;
+    s64 delta;
     int ret;
 
     dev_set_name(&cma_dev, "cma_device");
@@ -54,11 +57,16 @@ static int __init cma_driver_init(void) {
     cma_dev.coherent_dma_mask = DMA_BIT_MASK(32);
     cma_dev.dma_mask = &cma_dev.coherent_dma_mask;
 
+    start = ktime_get();
     vaddr = dma_alloc_coherent(&cma_dev, cma_size, &dma_handle, GFP_KERNEL);
+    end = ktime_get();
+
     if (!vaddr) {
         device_unregister(&cma_dev);
         return -ENOMEM;
     }
+
+    delta = ktime_to_ns(ktime_sub(end, start));
 
     ret = misc_register(&cma_misc);
     if (ret) {
@@ -67,7 +75,9 @@ static int __init cma_driver_init(void) {
         return ret;
     }
 
-    pr_info("CMA: Ready. Physical: %pad, Device: /dev/cma_test\n", &dma_handle);
+    pr_info("CMA Perf: Allocated %zu bytes in %lld ns\n", cma_size, delta);
+    pr_info("CMA: Virtual %p, Physical %pad\n", vaddr, &dma_handle);
+
     return 0;
 }
 
