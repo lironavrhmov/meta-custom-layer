@@ -7,6 +7,9 @@ inherit kernel kernel-yocto
 SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git;protocol=https;branch=linux-6.2.y \
            file://defconfig \
            file://cma.cfg"
+SRC_URI += " \
+    file://fragment.cfg \
+"
 
 SRCREV = "${AUTOREV}"
 
